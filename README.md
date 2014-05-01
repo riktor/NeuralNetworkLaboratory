@@ -1,4 +1,3 @@
-autoencoder
+NeuralNetworkLaboratory
 ===========
 
-autoencoder
