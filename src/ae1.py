@@ -38,7 +38,7 @@ class AutoEncoder(object):
         #oldw_h2o = self.w_h2o
         
         delta_h2o = (teacher-self.output) * self.output * (1.-self.output)
-        e1 = np.array(np.mat(delta_h2o).T * np.mat(self.hidden))
+        e1 = np.dot(np.array([delta_h2o]).T, np.array([self.hidden]))
         self.w_i2o = self.w_i2o + self.alpha * e1.T
 
         #e2 = delta_h2o
@@ -47,7 +47,7 @@ class AutoEncoder(object):
         #delta_i2h = self.hidden * (1.-self.hidden) * np.dot(self.w_h2o.T , delta_h2o)
         delta_i2h = self.hidden * (1.-self.hidden) * np.dot(self.w_i2o , delta_h2o)
         
-        f1 = np.array(np.mat(delta_i2h).T * np.mat(self.input))
+        f1 = np.dot(np.array([delta_i2h]).T, np.array([self.input]))
         self.w_i2o = self.w_i2o + self.alpha * f1
         
         #f2 = delta_i2h

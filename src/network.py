@@ -31,15 +31,17 @@ class Network(object):
     def __init__(self, layer_size=None): 
         if layer_size is None:
             raise Exception(u"error: set layer_size")
-        self.layers = []
+        
         np_rng = np.random.RandomState(1234)
-        for i in xrange(len(layer_size) - 1):
-            layer = Layer(size=layer_size[i], next_size=layer_size[i+1], np_rng=np_rng)
-            self.layers.append(layer)
+        self.layers = [ Layer(size=layer_size[i],
+                              next_size=layer_size[i+1],
+                              np_rng=np_rng)
+                        for i in xrange(len(layer_size)-1) ]
 
     def forward_propagation(self, input=None):
         if input is None:
             raise Exception(u"error: set input")
+        
         output = input
         for layer in self.layers:
             output = layer.get_output(output)
@@ -54,12 +56,13 @@ class Network(object):
         #delta = (target - layer.output) * grad(layer.activation, layer.output)
         #print np.mat(delta).shape
         #print np.mat(layer.input).shape
-        layer.w += layer.alpha * np.array(np.mat(layer.input).T * np.mat(delta))
+        
+        layer.w += layer.alpha * np.dot(np.array([layer.input]).T, np.array([delta]))
         layer.b += layer.alpha * delta
         delta = np.array(layer.input) * (1. - np.array(layer.input)) * np.dot(layer.w, delta.T)
         for layer in backlayers[1:]:
             #print delta
-            layer.w += layer.alpha * np.array(np.mat(layer.input).T * np.mat(delta))
+            layer.w += layer.alpha * np.dot(np.array([layer.input]).T, np.array([delta]))
             layer.b += layer.alpha * delta
             delta = np.array(layer.input) * (1. - np.array(layer.input)) * np.dot(layer.w, delta.T) 
     
@@ -73,10 +76,13 @@ class Layer(object):
                  activation=sigmoid, np_rng=None):
         if size is None or next_size is None:
             raise Exception(u"error: set size")
+        
         self.alpha = alpha
         self.activation = activation
+        
         if np_rng is None:
             np_rng = np.random.RandomState(123)
+            
         self.np_rng = np_rng
         self.w = np.array(np_rng.uniform(low = low, 
                                          high = high,
